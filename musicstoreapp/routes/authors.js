@@ -32,6 +32,20 @@ module.exports = function (app) {
         res.render("authors/authors.twig", { authors: authorsList });
     });
 
+    app.get('/authors/filter/:rol', function (req, res) {
+        let authorsList = [
+            { name: "Adrián Gutiérrez", group: "Rib", rol: "cantante" },
+            { name: "Fernando Remis", group: "Ven", rol: "trompetista" },
+            { name: "Hugo Carbajales", group: "Veg", rol: "saxofonista" },
+        ];
+
+        let filterRol = req.params.rol;
+
+        let filteredAuthors = authorsList.filter(author => author.rol === filterRol);
+
+        res.render("authors/authors.twig", { authors: filteredAuthors });
+    });
+
     app.get('/author*', function (req, res) {
         res.redirect('/authors');
     });
