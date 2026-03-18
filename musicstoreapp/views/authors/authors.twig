@@ -1,0 +1,28 @@
+{% extends "layout.twig" %}
+
+{% block title %} Lista de Autores – uoMusic {% endblock %}
+
+{% block main_container %}
+    <div class="container">
+        <h2>Lista de autores</h2>
+
+        <table class="table table-hover">
+            <thead>
+            <tr>
+                <th>Nombre</th>
+                <th>Grupo</th>
+                <th>Rol</th>
+            </tr>
+            </thead>
+            <tbody>
+            {% for author in authors %}
+                <tr>
+                    <td>{{ author.name }}</td>
+                    <td>{{ author.group }}</td>
+                    <td class="text-capitalize">{{ author.rol }}</td>
+                </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+    </div>
+{% endblock %}
