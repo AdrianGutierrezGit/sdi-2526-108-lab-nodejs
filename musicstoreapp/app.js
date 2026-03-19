@@ -4,6 +4,10 @@ var path = require('path');
 var cookieParser = require('cookie-parser');
 var logger = require('morgan');
 
+const { MongoClient } = require("mongodb");
+const connectionStrings = 'mongodb+srv://admin:sdi@musicstoreapp.vuwi6mf.mongodb.net/?appName=musicstoreapp';
+const dbClient = new MongoClient(connectionStrings);
+
 let app = express();
 
 let bodyParser = require('body-parser');
@@ -12,7 +16,7 @@ app.use(bodyParser.urlencoded({ extended: true }));
 
 var indexRouter = require('./routes/index');
 var usersRouter = require('./routes/users');
-require("./routes/songs.js")(app);
+require("./routes/songs.js")(app, dbClient);
 require("./routes/authors.js")(app);
 
 
