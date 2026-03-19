@@ -5,6 +5,13 @@ var cookieParser = require('cookie-parser');
 var logger = require('morgan');
 let app = express();
 
+let fileUpload = require('express-fileupload');
+app.use(fileUpload({
+  limits: { fileSize: 50 * 1024 * 1024 },
+  createParentPath: true
+}));
+app.set('uploadPath', __dirname)
+
 const { MongoClient } = require("mongodb");
 const connectionStrings = 'mongodb+srv://admin:sdi@musicstoreapp.vuwi6mf.mongodb.net/?appName=musicstoreapp';
 const dbClient = new MongoClient(connectionStrings);
