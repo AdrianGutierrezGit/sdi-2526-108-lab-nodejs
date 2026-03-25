@@ -18,6 +18,7 @@ app.use("/songs/add",userSessionRouter);
 app.use("/publications",userSessionRouter);
 app.use("/audios/",userAudiosRouter);
 app.use("/shop/",userSessionRouter)
+app.use("/songs/favorites",userSessionRouter);
 
 
 let crypto = require('crypto');
@@ -43,7 +44,9 @@ app.use(bodyParser.urlencoded({ extended: true }));
 const usersRepository = require("./repositories/usersRepository.js");
 usersRepository.init(app, dbClient);
 require("./routes/users.js")(app, usersRepository);
-
+const favoritesRepository = require("./repositories/favoriteSongsRepository.js");
+favoritesRepository.init(app, dbClient);
+require("./routes/songs/favorites.js")(app, favoritesRepository);
 var indexRouter = require('./routes/index');
 require("./routes/songs.js")(app, songsRepository);
 require("./routes/authors.js")(app);
