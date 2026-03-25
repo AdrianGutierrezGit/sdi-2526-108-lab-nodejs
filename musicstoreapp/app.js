@@ -47,8 +47,11 @@ require("./routes/users.js")(app, usersRepository);
 const favoritesRepository = require("./repositories/favoriteSongsRepository.js");
 favoritesRepository.init(app, dbClient);
 require("./routes/songs/favorites.js")(app, favoritesRepository);
+const commentsRepository = require("./repositories/commentsRepository.js");
+commentsRepository.init(app, dbClient);
+require("./routes/comments.js")(app, commentsRepository);
 var indexRouter = require('./routes/index');
-require("./routes/songs.js")(app, songsRepository);
+require("./routes/songs.js")(app, songsRepository,commentsRepository);
 require("./routes/authors.js")(app);
 
 

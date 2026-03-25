@@ -16,4 +16,29 @@
 			</div>
 		</div>
 	</div>
+
+	<hr>
+
+	<h4>Añadir comentario</h4>
+	<form method="post" action="/comments/{{ song._id }}">
+		<div class="form-group">
+			<label for="text">Comentario</label>
+			<textarea class="form-control" id="text" name="text" rows="3" required></textarea>
+		</div>
+		<button type="submit" class="btn btn-primary">Enviar comentario</button>
+	</form>
+
+	<h3>Comentarios</h3>
+	{% if comments is empty %}
+		<p>No hay comentarios todavía.</p>
+	{% else %}
+		<ul class="list-group">
+			{% for comment in comments %}
+				<li class="list-group-item">
+					<strong>{{ comment.author }}</strong>: {{ comment.text }}
+				</li>
+			{% endfor %}
+		</ul>
+	{% endif %}
+
 {% endblock %}
