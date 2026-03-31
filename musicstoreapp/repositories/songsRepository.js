@@ -7,6 +7,27 @@ module.exports = {
         this.dbClient = dbClient;
         this.app = app;
     },
+    getPurchases: async function (filter, options) {
+        try {
+            await this.dbClient.connect();
+            const database = this.dbClient.db(this.database);
+            const purchasesCollection = database.collection('purchases');
+            const purchases = await purchasesCollection.find(filter, options).toArray();
+            return purchases;
+        } catch (error) {
+            throw (error);
+        }
+    },
+    buySong: async function (shop) {
+        try {
+            await this.dbClient.connect();
+            const database = this.dbClient.db(this.database);
+            const purchasesCollection = database.collection('purchases');
+            return await purchasesCollection.insertOne(shop);
+        } catch (error) {
+            throw (error);
+        }
+    },
     deleteSong: async function (filter, options) {
         try { await this.dbClient.connect();
             const database = this.dbClient.db(this.database);
