@@ -6,7 +6,7 @@ module.exports = function (app, commentsRepository) {
         }
 
         const comment = {
-            songId: new ObjectId(req.params.id),
+            songId: new ObjectId(req.params.song_id),
             text: req.body.text,
             author: req.session.user
         };
@@ -15,7 +15,7 @@ module.exports = function (app, commentsRepository) {
             if (result.error) {
                 res.status(500).send(result.error);
             } else {
-                res.redirect("/songs/" + req.params.id);
+                res.redirect("/songs/" + req.params.song_id);
             }
         });
     });
