@@ -17,9 +17,9 @@ module.exports = function (app, usersRepository) {
       res.redirect("/users/login" + "?message=Nuevo usuario registrado." +
           "&messageType=alert-info");
     }).catch(error => {
-      res.redirect("/users/signup" +
+      res.redirect("error/" +
           "?message=Se ha producido un error al registrar el usuario." +
-          "&messageType=alert-danger")
+          "&messageType=alert-danger&error=" + error)
     });
   });
 
@@ -38,14 +38,14 @@ module.exports = function (app, usersRepository) {
     usersRepository.findUser(filter, options).then(user => {
       if (user == null) {
         req.session.user = null;
-        res.redirect("/users/login" + "?message=Email o password incorrecto"+ "&messageType=alert-danger ");
+        res.redirect("/error?message=Email o password incorrecto"+ "&messageType=alert-danger")
       } else {
         req.session.user = user.email;
         res.redirect("/publications");
       }
     }).catch(error => {
       req.session.user = null;
-      res.redirect("/users/login" + "?message=Se ha producido un error al buscar el usuario"+ "&messageType=alert-danger ");
+      res.redirect("/error?message=Se ha producido un error al buscar el usuario"+ "&messageType=alert-danger ")
     })
   })
 
