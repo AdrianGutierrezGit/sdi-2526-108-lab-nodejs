@@ -57,6 +57,7 @@ commentsRepository.init(app, dbClient);
 require("./routes/comments.js")(app, commentsRepository);
 var indexRouter = require('./routes/index');
 require("./routes/songs.js")(app, songsRepository,commentsRepository);
+require("./routes/api/songsAPIv1.0.js")(app, songsRepository);
 require("./routes/authors.js")(app);
 
 
