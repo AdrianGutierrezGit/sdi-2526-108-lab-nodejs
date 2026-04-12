@@ -17,6 +17,9 @@
     "mongodb": "^7.1.0",
     "morgan": "^1.10.1",
     "request": "^2.88.2",
-    "twig": "^2.0.0"
+    "twig": "^2.0.0",
+    "swagger-jsdoc": "^6.2.8",
+    "swagger-ui-express": "^5.0.1"
+
   }
 }
