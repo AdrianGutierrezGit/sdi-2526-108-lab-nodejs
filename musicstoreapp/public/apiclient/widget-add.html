@@ -28,6 +28,8 @@
 
 <script>
     function widgetAddSong( ) {
+        $("#widget-agregar-errores").remove();
+
         $.ajax({
             url: URLBase + "/songs",
             type: "POST",
@@ -39,11 +41,27 @@
             dataType: 'json',
             headers: {"token": token},
             success: function (response) {
-                console.log(response); // <-- Prueba
+                console.log(response);
                 $("#main-container").load("widget-songs.html");
             },
             error: function (error) {
-                $("#main-container").load("widget-login.html");
+                $("#widget-agregar-errores").remove();
+
+                if (error.status === 400 || error.status === 409) {
+                    let htmlError = "<div id='widget-agregar-errores' class='alert alert-danger'>";
+
+                    if (error.responseJSON && error.responseJSON.errors) {
+                        htmlError += "<ul>";
+                        error.responseJSON.errors.forEach(function(err) {
+                            htmlError += "<li>" + err.msg + "</li>";
+                            htmlError += "</ul>";
+                        });
+                    }
+                    htmlError += "</div>";
+                    $("#widget-agregar").prepend(htmlError);
+                } else {
+                    $("#main-container").load("widget-login.html");
+                }
             }
         });
     }

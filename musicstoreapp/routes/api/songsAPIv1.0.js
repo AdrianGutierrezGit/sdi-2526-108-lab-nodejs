@@ -1,4 +1,6 @@
 const {ObjectId} = require("mongodb");
+const {songValidatorInsert} = require("./songValidator");
+const {validationResult} = require("express-validator");
 module.exports = function (app, songsRepository, usersRepository) {
     /**
      * @swagger
@@ -87,6 +89,10 @@ module.exports = function (app, songsRepository, usersRepository) {
         try {
             let songId = new ObjectId(req.params.id)
             let filter = {_id: songId}
+            const author = res.user || req.session.user;
+            if (author !== songsRepository.findSong(songId).authors) {
+                return res.status(401).json({ error: "La cancion no se puede modificar ya que el usuario no es el dueño de la cancion" });
+            }
             songsRepository.deleteSong(filter, {}).then(result => {
                 if (result === null || result.deletedCount === 0) {
                     res.status(404).json({error: "ID inválido o no existe, no se ha borrado el registro."});
@@ -100,6 +106,85 @@ module.exports = function (app, songsRepository, usersRepository) {
             res.status(500). json({error: error.message})
         }
     });
+    /**
+     * @swagger
+     * /api/v1.0/songs:
+     *   post:
+     *     summary: Crear una nueva canción
+     *     description: Añade una nueva canción al sistema.
+     *     tags:
+     *       - Songs
+     *     requestBody:
+     *       required: true
+     *       content:
+     *         application/json:
+     *           schema:
+     *             $ref: '#/components/schemas/SongRequest'
+     *     responses:
+     *       201:
+     *         description: Canción creada correctamente.
+     *         content:
+     *           application/json:
+     *             schema:
+     *               type: object
+     *               properties:
+     *                 message:
+     *                   type: string
+     *                   example: Canción añadida correctamente.
+     *                 _id:
+     *                   type: string
+     *       409:
+     *         description: Conflicto, la canción ya existe.
+     *         content:
+     *           application/json:
+     *             schema:
+     *               type: object
+     *               properties:
+     *                 error:
+     *                   type: string
+     *                   example: No se ha podido crear la canción. El recurso ya existe.
+     *       500:
+     *         description: Error interno del servidor.
+     *         content:
+     *           application/json:
+     *             schema:
+     *               type: object
+     *               properties:
+     *                 error:
+     *                   type: string
+     */
+    app.post('/api/v1.0/songs', songValidatorInsert, function (req, res) {
+        try {
+            const errors = validationResult(req);
+
+            if (!errors.isEmpty()) {
+                res.status(422);
+                res.json({errors: errors.array()})
+            } else {
+
+                let song = {
+                    title: req.body.title.trim(),
+                    kind: req.body.kind.trim(),
+                    price: Number(req.body.price),
+                    author: res.user || req.session.user
+                }
+
+                songsRepository.insertSong(song, function (songId) {
+                    if (songId === null) {
+                        res.status(409).json({error: "No se ha podido crear la canción. El recurso ya existe."});
+                    } else {
+                        res.status(201).json({
+                            message: "Canción añadida correctamente.",
+                            _id: songId
+                        })
+                    }
+                });
+            }
+            } catch (error) {
+                res.status(500).json({error: "Se ha producido un error al intentar crear la canción: " + error.message})
+            }
+        });
+
 
     /**
      * @swagger
@@ -148,14 +233,40 @@ module.exports = function (app, songsRepository, usersRepository) {
      *                 error:
      *                   type: string
      */
-    app.post('/api/v1.0/songs', function (req, res) {
+    /*app.post('/api/v1.0/songs', function (req, res) {
         try {
-            let song = {
-                title: req.body.title,
-                kind: req.body.kind,
-                price: req.body.price,
-                author: req.session.user
+            let errores = [];
+
+            if (!req.body.title || req.body.title.trim().length === 0) {
+                errores.push({ value: req.body.title, msg: "El título de la cancion no puede estar vacio.", param: "title", location: "body" });
             }
+
+            if (!req.body.kind || req.body.kind.trim().length === 0) {
+                errores.push({ value: req.body.kind, msg: "El género de la canción no puede estar vacio.", param: "kind", location: "body" });
+            }
+
+            if (typeof req.body.price === 'undefined' || req.body.price === '') {
+                errores.push({ value: req.body.price, msg: "El precio de la cancion no puede estar vacio.", param: "price", location: "body" });
+            } else if (req.body.price <= 0) {
+                errores.push({ value: req.body.price, msg: "El precio debe ser un número positivo mayor que 0.", param: "price", location: "body" });
+            }
+
+            if (errores.length > 0) {
+                return res.status(400).json({ errors: errores });
+            }
+
+            const author = res.user || req.session.user;
+            if (!author) {
+                return res.status(401).json({ error: "Usuario no autenticado." });
+            }
+
+            let song = {
+                title: req.body.title.trim(),
+                kind: req.body.kind.trim(),
+                price: Number(req.body.price),
+                author: author
+            }
+
             songsRepository.insertSong(song, function (songId) {
                 if (songId === null) {
                     res.status(409).json({error: "No se ha podido crear la canción. El recurso ya existe."});
@@ -167,10 +278,9 @@ module.exports = function (app, songsRepository, usersRepository) {
                 }
             });
         } catch (error) {
-            res.status(500).json({error: "Se ha producido un error al intentar crear la canción: " +
-                    error.message})
+            res.status(500).json({error: "Se ha producido un error al intentar crear la canción: " + error.message})
         }
-    });
+    });*/
 
     /**
      * @swagger
