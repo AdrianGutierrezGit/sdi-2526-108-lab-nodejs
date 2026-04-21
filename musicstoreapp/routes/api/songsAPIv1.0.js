@@ -89,21 +89,34 @@ module.exports = function (app, songsRepository, usersRepository) {
         try {
             let songId = new ObjectId(req.params.id)
             let filter = {_id: songId}
-            const author = res.user || req.session.user;
-            if (author !== songsRepository.findSong(songId).authors) {
-                return res.status(401).json({ error: "La cancion no se puede modificar ya que el usuario no es el dueño de la cancion" });
-            }
-            songsRepository.deleteSong(filter, {}).then(result => {
-                if (result === null || result.deletedCount === 0) {
-                    res.status(404).json({error: "ID inválido o no existe, no se ha borrado el registro."});
-                } else {
-                    res.status(200).send(JSON.stringify(result));
+            const userEmail = res.user || req.session.user; // El email del que está logueado
+
+            songsRepository.findSong(filter, {}).then(song => {
+                if (song === null) {
+                    return res.status(404).json({ error: "Canción no encontrada." });
                 }
+
+                if (userEmail !== song.author) {
+                    return res.status(401).json({
+                        error: "La canción no se puede eliminar ya que no eres el dueño."
+                    });
+                }
+
+                songsRepository.deleteSong(filter, {}).then(result => {
+                    if (result.deletedCount === 0) {
+                        res.status(404).json({ error: "No se ha borrado nada." });
+                    } else {
+                        res.status(200).json(result);
+                    }
+                }).catch(error => {
+                    res.status(500).json({ error: "Error al borrar: " + error.message });
+                });
+
             }).catch(error => {
-                res.status(500).json({error: "Se ha producido un error:" + error.message})
+                res.status(500).json({ error: "Error al buscar la canción: " + error.message });
             });
         } catch (error) {
-            res.status(500). json({error: error.message})
+            res.status(500).json({ error: error.message });
         }
     });
     /**
