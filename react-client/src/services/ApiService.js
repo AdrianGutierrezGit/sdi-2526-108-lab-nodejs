@@ -16,11 +16,14 @@ export const apiFetch = async (url, options = {}) => {
     }
 
     if (!res.ok) {
-        if (res.status === 401) {
-            localStorage.removeItem("token");
-            throw new Error("UNAUTHORIZED");
-        }
         const errorDetails = data?.errors || data?.error || "Error en la API";
+
+        if (res.status === 401) {
+            const unauthError = new Error("UNAUTHORIZED");
+            unauthError.details = errorDetails;
+            throw unauthError;
+        }
+
         const apiError = new Error("API_ERROR");
         apiError.details = errorDetails;
         throw apiError;

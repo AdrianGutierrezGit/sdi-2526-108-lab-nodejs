@@ -1,10 +1,10 @@
 import React from 'react';
 
-const SongToast = ({ errors, type = 'danger' }) => {
+const SongToast = ({ errors, type = 'danger', float = false }) => {
     if (!errors || errors.length === 0) return null;
 
-    const isSuccess = type === 'success';
-    const containerClass = `alert alert-${type} ${isSuccess ? 'toast-fixed-bottom' : 'mt-3'}`;
+    const isFloating = type === 'success' || float;
+    const containerClass = `alert alert-${type} ${isFloating ? 'toast-fixed-bottom' : 'mt-3'}`;
 
     return (
         <div className={containerClass} role="alert">
